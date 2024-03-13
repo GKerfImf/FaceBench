@@ -7,17 +7,18 @@ function getRandomFaceId() {
     .padStart(5, "0");
 }
 
-const Face: React.FC<{ id: string }> = ({ id }) => {
-  console.log(id);
+const Face: React.FC<{ faceId: string }> = ({ faceId }) => {
   return (
     <img
-      src={`https://whichfaceisreal.blob.core.windows.net/public/realimages/${id}.jpeg`}
+      src={`https://whichfaceisreal.blob.core.windows.net/public/realimages/${faceId}.jpeg`}
       className="rounded-full h-60 w-60"
     />
   );
 };
 
 function App() {
+  const [gameState, setGameState] = useState<"start" | "play" | "finish">("start");
+
   const [lives, setLives] = useState(3);
   const [score, setScore] = useState(0);
 
@@ -50,6 +51,9 @@ function App() {
     if (faces.includes(currentFace)) {
       setScore((prev) => prev + 1);
     } else {
+      if (lives == 1) {
+        setGameState("finish");
+      }
       setLives((prev) => prev - 1);
     }
     getNextFace();
@@ -57,6 +61,9 @@ function App() {
 
   const newClick = () => {
     if (faces.includes(currentFace)) {
+      if (lives == 1) {
+        setGameState("finish");
+      }
       setLives((prev) => prev - 1);
     } else {
       setScore((prev) => prev + 1);
@@ -66,16 +73,40 @@ function App() {
 
   const buttonStyle =
     "bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 m-3 border border-gray-400 rounded shadow";
+  // "rounded bg-amber-500 px-4 py-2 text-sm text-white shadow-sm"
+
+  const Start = () => {
+    return (
+      <div className="h-full flex flex-col justify-center items-center">
+        <button
+          className={buttonStyle}
+          onClick={() => {
+            setGameState("play");
+          }}
+        >
+          Start
+        </button>
+        <div className="group relative m-2 flex justify-center">
+          <button className={buttonStyle}> How to play? </button>
+          <span className="w-60 absolute top-10 scale-0 rounded bg-gray-800 p-2 text-base text-white group-hover:scale-100 text-center">
+            You will be presented with a series of faces. Press "new" if the face is being displayed for the first time.
+            Press "seen" if the face has been shown previously. Get as many right answers as possible. You are allowed
+            to make up to three mistakes.
+          </span>
+        </div>
+      </div>
+    );
+  };
 
   const Game = () => {
     return (
-      <div className="p-6 bg-slate-50 border-2">
+      <div className="p-6 bg-slate-50 h-full ">
         <div className="flex justify-evenly text-2xl border-b">
           <p className=" text-2xl">Lives {lives}</p>
           <p>Score {score}</p>
         </div>
         <div className="flex justify-center pt-4">
-          <Face id={currentFace!} />
+          <Face faceId={currentFace!} />
         </div>
         <div className="flex justify-center">
           <button className={buttonStyle} onClick={seenClick}>
@@ -91,7 +122,7 @@ function App() {
 
   const FinalScore = () => {
     return (
-      <div className="h-full flex flex-col justify-center items-center text-3xl text-blue-700 font-mono border-2 bg-slate-50">
+      <div className="h-full flex flex-col justify-center items-center text-3xl text-blue-700 font-mono bg-slate-50">
         <div className="flex flex-col items-center justify-center">
           <p className="w-full text-center">Your score: {score}</p>
           <button
@@ -109,8 +140,11 @@ function App() {
 
   return (
     <div className="flex justify-center pt-10">
-      <div className="w-96 h-96 flex-col items-center justify-center">{lives > 0 ? <Game /> : <FinalScore />}</div>
+      <div className="w-96 h-96 flex-col items-center justify-center border-2">
+        {gameState == "start" ? <Start /> : gameState == "play" ? <Game /> : <FinalScore />}
+      </div>
       <div>
+        {/* For caching reasons, we load a few new images in advance. */}
         {faceQueue.map((e, i) => {
           return (
             <img
