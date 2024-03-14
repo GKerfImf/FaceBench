@@ -71,13 +71,15 @@ function App() {
     getNextFace();
   };
 
-  const buttonStyle =
-    "bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 m-3 border border-gray-400 rounded shadow";
+  const buttonStyle = "bg-white hover:bg-gray-100 text-gray-800 py-2 px-4 m-3 border border-gray-400 rounded shadow";
   // "rounded bg-amber-500 px-4 py-2 text-sm text-white shadow-sm"
 
   const Start = () => {
     return (
       <div className="h-full flex flex-col justify-center items-center">
+        <h1 className="text-3xl text-center m-3 p-3 border-b-1 text-blue-900 border-b">
+          Human Face Retention Benchmark
+        </h1>
         <button
           className={buttonStyle}
           onClick={() => {
@@ -122,7 +124,7 @@ function App() {
 
   const FinalScore = () => {
     return (
-      <div className="h-full flex flex-col justify-center items-center text-3xl text-blue-700 font-mono bg-slate-50">
+      <div className="h-full flex flex-col justify-center items-center text-3xl text-blue-700 bg-slate-50">
         <div className="flex flex-col items-center justify-center">
           <p className="w-full text-center">Your score: {score}</p>
           <button
@@ -139,7 +141,7 @@ function App() {
   };
 
   return (
-    <div className="flex justify-center pt-10">
+    <div className="flex justify-center pt-10 font-mono">
       <div className="w-96 h-96 flex-col items-center justify-center border-2">
         {gameState == "start" ? <Start /> : gameState == "play" ? <Game /> : <FinalScore />}
       </div>
