@@ -141,7 +141,7 @@ function App() {
   };
 
   return (
-    <div className="flex justify-center pt-10 font-mono">
+    <div className="flex justify-center pt-10 font-poppins">
       <div className="w-96 h-96 flex-col items-center justify-center border-2">
         {gameState == "start" ? <Start /> : gameState == "play" ? <Game /> : <FinalScore />}
       </div>
