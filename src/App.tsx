@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+
 import "./index.css";
 
 function getRandomFaceId() {
@@ -71,30 +74,36 @@ function App() {
     getNextFace();
   };
 
-  const buttonStyle = "bg-white hover:bg-gray-100 text-gray-800 py-2 px-4 m-3 border border-gray-400 rounded shadow";
-  // "rounded bg-amber-500 px-4 py-2 text-sm text-white shadow-sm"
-
   const Start = () => {
+    const Title = () => {
+      return <h1 className="text-3xl text-center m-3 p-3 border-b text-blue-900">Human Face Retention Benchmark</h1>;
+    };
+
+    const instructions =
+      'You will be presented with a series of faces. Press "new" if the face is being displayed for the first time. Press "seen" if the face has been shown previously. Get as many right answers as possible. You are allowed to make up to three mistakes.';
+
     return (
-      <div className="h-full flex flex-col justify-center items-center">
-        <h1 className="text-3xl text-center m-3 p-3 border-b-1 text-blue-900 border-b">
-          Human Face Retention Benchmark
-        </h1>
-        <button
-          className={buttonStyle}
-          onClick={() => {
-            setGameState("play");
-          }}
-        >
-          Start
-        </button>
-        <div className="group relative m-2 flex justify-center">
-          <button className={buttonStyle}> How to play? </button>
-          <span className="w-60 absolute top-10 scale-0 rounded bg-gray-800 p-2 text-base text-white group-hover:scale-100 text-center">
-            You will be presented with a series of faces. Press "new" if the face is being displayed for the first time.
-            Press "seen" if the face has been shown previously. Get as many right answers as possible. You are allowed
-            to make up to three mistakes.
-          </span>
+      <div className="h-full flex flex-col">
+        <Title />
+        <div className="flex flex-col flex-1 h-full justify-center items-center">
+          <Button
+            className="m-1"
+            variant="outline"
+            size="lg"
+            onClick={() => {
+              setGameState("play");
+            }}
+          >
+            Start
+          </Button>
+          <Popover>
+            <PopoverTrigger className="m-1">
+              <Button variant="outline" size="lg">
+                How to play?
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent>{instructions}</PopoverContent>
+          </Popover>
         </div>
       </div>
     );
@@ -111,12 +120,12 @@ function App() {
           <Face faceId={currentFace!} />
         </div>
         <div className="flex justify-center">
-          <button className={buttonStyle} onClick={seenClick}>
+          <Button className="my-4 mx-2" variant="outline" size="default" onClick={seenClick}>
             seen
-          </button>
-          <button className={buttonStyle} onClick={newClick}>
+          </Button>
+          <Button className="my-4 mx-2" variant="outline" size="default" onClick={newClick}>
             new
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -127,14 +136,17 @@ function App() {
       <div className="h-full flex flex-col justify-center items-center text-3xl text-blue-700 bg-slate-50">
         <div className="flex flex-col items-center justify-center">
           <p className="w-full text-center">Your score: {score}</p>
-          <button
-            className={`${buttonStyle} text-sm`}
+
+          <Button
+            className="text-black m-4"
+            variant="outline"
+            size="lg"
             onClick={() => {
               window.location.reload();
             }}
           >
             Play again
-          </button>
+          </Button>
         </div>
       </div>
     );
