@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
@@ -11,11 +11,15 @@ function getRandomFaceId() {
 }
 
 const Face: React.FC<{ faceId: string }> = ({ faceId }) => {
+  const url = `https://whichfaceisreal.blob.core.windows.net/public/realimages/${faceId}.jpeg`;
+  return <img src={url} className="rounded-full h-60 w-60" />;
+};
+
+const HotKey: React.FC<{ value: string }> = ({ value }) => {
   return (
-    <img
-      src={`https://whichfaceisreal.blob.core.windows.net/public/realimages/${faceId}.jpeg`}
-      className="rounded-full h-60 w-60"
-    />
+    <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+      <span className="text-xs">{value}</span>
+    </kbd>
   );
 };
 
@@ -75,41 +79,79 @@ function App() {
   };
 
   const Start = () => {
+    useEffect(() => {
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key == " " || e.code == "Space") {
+          e.preventDefault();
+          setGameState("play");
+        }
+      };
+      document.addEventListener("keydown", handleKeyDown);
+      return () => document.removeEventListener("keydown", handleKeyDown);
+    }, []);
+
     const Title = () => {
       return <h1 className="text-3xl text-center m-3 p-3 border-b text-blue-900">Human Face Retention Benchmark</h1>;
     };
 
-    const instructions =
-      'You will be presented with a series of faces. Press "new" if the face is being displayed for the first time. Press "seen" if the face has been shown previously. Get as many right answers as possible. You are allowed to make up to three mistakes.';
+    const StartButton = () => {
+      return (
+        <Button
+          className="m-1"
+          variant="outline"
+          size="lg"
+          onClick={() => {
+            setGameState("play");
+          }}
+        >
+          <p>Start</p> &nbsp;
+          <HotKey value={"⎵"} />
+        </Button>
+      );
+    };
+
+    const Instructions = () => {
+      const instructions =
+        'You will be presented with a series of faces. Press "new" if the face is being displayed for the first time. Press "seen" if the face has been shown previously. Get as many right answers as possible. You are allowed to make up to three mistakes.';
+
+      return (
+        <Popover>
+          <PopoverTrigger asChild className="m-1">
+            <Button variant="outline" size="lg">
+              How to play?
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent>{instructions}</PopoverContent>
+        </Popover>
+      );
+    };
 
     return (
       <div className="h-full flex flex-col">
         <Title />
         <div className="flex flex-col flex-1 h-full justify-center items-center">
-          <Button
-            className="m-1"
-            variant="outline"
-            size="lg"
-            onClick={() => {
-              setGameState("play");
-            }}
-          >
-            Start
-          </Button>
-          <Popover>
-            <PopoverTrigger className="m-1">
-              <Button variant="outline" size="lg">
-                How to play?
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent>{instructions}</PopoverContent>
-          </Popover>
+          <StartButton />
+          <Instructions />
         </div>
       </div>
     );
   };
 
   const Game = () => {
+    useEffect(() => {
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === "ArrowLeft") {
+          e.preventDefault();
+          seenClick();
+        } else if (e.key === "ArrowRight") {
+          e.preventDefault();
+          newClick();
+        }
+      };
+      document.addEventListener("keydown", handleKeyDown);
+      return () => document.removeEventListener("keydown", handleKeyDown);
+    }, []);
+
     return (
       <div className="p-6 bg-slate-50 h-full ">
         <div className="flex justify-evenly text-2xl border-b">
@@ -121,10 +163,10 @@ function App() {
         </div>
         <div className="flex justify-center">
           <Button className="my-4 mx-2" variant="outline" size="default" onClick={seenClick}>
-            seen
+            <p>seen &nbsp;</p> <HotKey value={"←"} />
           </Button>
           <Button className="my-4 mx-2" variant="outline" size="default" onClick={newClick}>
-            new
+            <p>new &nbsp;</p> <HotKey value={"→"} />
           </Button>
         </div>
       </div>
@@ -132,6 +174,17 @@ function App() {
   };
 
   const FinalScore = () => {
+    useEffect(() => {
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key == " " || e.code == "Space") {
+          e.preventDefault();
+          window.location.reload();
+        }
+      };
+      document.addEventListener("keydown", handleKeyDown);
+      return () => document.removeEventListener("keydown", handleKeyDown);
+    }, []);
+
     return (
       <div className="h-full flex flex-col justify-center items-center text-3xl text-blue-700 bg-slate-50">
         <div className="flex flex-col items-center justify-center">
@@ -145,7 +198,7 @@ function App() {
               window.location.reload();
             }}
           >
-            Play again
+            <p>Play again</p> &nbsp; <HotKey value={"⎵"} />
           </Button>
         </div>
       </div>
