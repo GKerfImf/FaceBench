@@ -49,26 +49,13 @@ function App() {
     }
   };
 
-  const seenClick = () => {
-    if (faces.includes(currentFace)) {
+  const processAction = (action: "seen" | "new") => {
+    if ((action == "seen" && faces.includes(currentFace)) || (action == "new" && !faces.includes(currentFace))) {
       setScore((prev) => prev + 1);
+    } else if (lives == 1) {
+      setGameState("finish");
     } else {
-      if (lives == 1) {
-        setGameState("finish");
-      }
       setLives((prev) => prev - 1);
-    }
-    getNextFace();
-  };
-
-  const newClick = () => {
-    if (faces.includes(currentFace)) {
-      if (lives == 1) {
-        setGameState("finish");
-      }
-      setLives((prev) => prev - 1);
-    } else {
-      setScore((prev) => prev + 1);
     }
     getNextFace();
   };
@@ -137,10 +124,10 @@ function App() {
       const handleKeyDown = (e: KeyboardEvent) => {
         if (e.key === "ArrowLeft") {
           e.preventDefault();
-          seenClick();
+          processAction("seen");
         } else if (e.key === "ArrowRight") {
           e.preventDefault();
-          newClick();
+          processAction("new");
         }
       };
       document.addEventListener("keydown", handleKeyDown);
@@ -164,10 +151,10 @@ function App() {
     const Controls: React.FC = () => {
       return (
         <div className="flex justify-center">
-          <Button className="my-4 mx-2" variant="outline" size="default" onClick={seenClick}>
+          <Button className="my-4 mx-2" variant="outline" size="default" onClick={() => processAction("seen")}>
             <p>seen &nbsp;</p> <HotKey value={"←"} />
           </Button>
-          <Button className="my-4 mx-2" variant="outline" size="default" onClick={newClick}>
+          <Button className="my-4 mx-2" variant="outline" size="default" onClick={() => processAction("new")}>
             <p>new &nbsp;</p> <HotKey value={"→"} />
           </Button>
         </div>
