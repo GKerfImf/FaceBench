@@ -108,12 +108,66 @@ function App() {
       );
     };
 
+    const Stats: React.FC = () => {
+      const [pr, setPR] = useState(JSON.parse(localStorage.getItem("hfrb-pr")!) || 0);
+      const [hist, setHist] = useState(JSON.parse(localStorage.getItem("hfrb-hist")!) || []);
+      const average = hist.slice(-5).reduce((acc: number, v: number) => acc + v, 0) / 5.0;
+
+      useEffect(() => {
+        const curr: number | null = localStorage.getItem("hfrb-curr")
+          ? JSON.parse(localStorage.getItem("hfrb-curr")!)
+          : null;
+
+        if (curr != null) {
+          localStorage.setItem("hfrb-pr", JSON.stringify(Math.max(pr, curr)));
+          setPR(Math.max(pr, curr));
+
+          localStorage.setItem("hfrb-hist", JSON.stringify([...hist, curr]));
+          setHist([...hist, curr]);
+
+          localStorage.setItem("hfrb-curr", JSON.stringify(null));
+        }
+      });
+
+      const records = [
+        {
+          pr: `Personal best: ${pr}`,
+        },
+        {
+          pr: `Last 5 average: ${average}`,
+        },
+      ];
+
+      return (
+        <Popover>
+          <PopoverTrigger asChild className="m-1">
+            <Button variant="outline" size="lg">
+              Statistics
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent>
+            <div className="space-y-1.5 p-2">
+              {records.map((record, index) => (
+                <div key={index} className="mb-4 grid grid-cols-[25px_1fr] items-start pb-4 last:mb-0 last:pb-0">
+                  <span className="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium leading-none">{record.pr}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
+      );
+    };
+
     return (
       <div className="h-full flex flex-col">
         <Title />
         <div className="flex flex-col flex-1 h-full justify-center items-center">
           <StartButton />
           <Instructions />
+          <Stats />
         </div>
       </div>
     );
@@ -133,6 +187,10 @@ function App() {
       document.addEventListener("keydown", handleKeyDown);
       return () => document.removeEventListener("keydown", handleKeyDown);
     }, []);
+
+    useEffect(() => {
+      localStorage.setItem("hfrb-curr", JSON.stringify(score));
+    }, [score]);
 
     const Score: React.FC = () => {
       return (
@@ -229,6 +287,7 @@ function App() {
       </div>
     );
   };
+
   return (
     <div className="flex justify-center pt-10 font-poppins">
       <div className="w-96 h-96 flex-col items-center justify-center border-2">
